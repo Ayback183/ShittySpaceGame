@@ -4,6 +4,7 @@
 #position = [[QuadrantX,QuadrantY],[SectorX,SectorY]]
 
 import random
+from lst_flavor_text import flavor_text_damage
 
 class Player:
     def __init__(self, ship_name, captain_name, energy_max, shields, torpedoes_max):
@@ -12,21 +13,22 @@ class Player:
         self.shields = shields
         self.torpedoes_max = torpedoes_max
         self.torpedoes = torpedoes_max
-        self.position = [[5,5],[5,5]]
+        self.position = []
         self.systems = {}
         self.set_all_systems_to_ok()
         self.ship_name = ship_name
         self.captain_name = captain_name
         print(f"Ship Created")
         self.print_status()
+        self.damage_report()
 
     def print_status(self):
         print(f"USS {self.ship_name}, Captain {self.captain_name} commanding.")
         print(f"Energy: {self.energy}/{self.energy_max}  Torpedoes: {self.torpedoes}/{self.torpedoes_max}")
         print(f"Shields: {self.shields}")
-        print(f"Position - Quadrant: {self.position[0][0]}, {self.position[0][1]}  Sector {self.position[1][0]},{self.position[1][1]}")
 
     def damage_report(self):
+        print(f"\nDamage Report:\n")
         for system, status in self.systems.items():
             print (f"{system}  {status}")        
 
@@ -46,6 +48,14 @@ class Player:
             self.shields += add_energy
             print (f"{add_energy} energy transferred to shields")
 
+    def remove_energy_from_shields(self, remove_energy):
+        if self.shields < remove_energy:
+            print("Not enough energy in shields.")
+        else:
+            self.energy += remove_energy
+            self.shield -= remove_energy
+            print(f"{remove_energy} transferred from the shields.")
+
     def set_all_systems_to_ok(self):
         self.systems = {
             "Engines": "OK",
@@ -56,7 +66,6 @@ class Player:
             "Warp Drive": "OK",
             "Communications": "OK"
         }
-        print (f"All systems nominal.")
 
     def repair_system(self, system):
         if self.systems[system] == "OK":
@@ -91,7 +100,11 @@ class Player:
 
     def damage_system(self, system):
         if self.systems[system] == "Damaged":
-            print(f"{system} is already damaged.")
+            if flavor_text_damage == []:
+                damage_text = "Lights flickering, explosion noises, etc..."
+            else:
+                damage_text = flavor_text_damage.pop(random.randint(0,len(flavor_text_damage) - 1))
+            print(f"{damage_text}")
         else:
             self.systems[system] = "Damaged"
             print(f"{system} has been damaged!")
